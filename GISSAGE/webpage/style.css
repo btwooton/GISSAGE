@@ -1,0 +1,433 @@
+html, body {
+  padding: 0;
+  margin: 0;
+  height: 100%;
+  width: 100%;
+}
+
+#wrapper {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+}
+
+#sideBar {
+  position: absolute;
+  z-index: 99;
+  top: 0;
+  left: 0;
+  height: 100%;
+  /*min-width: 220px;*/
+  background: rgba(39, 55, 84, 0.54);
+  width: 25vw;
+  transition: width 0.5s;
+}
+
+#sideBar.hidden {
+  width: 0%;
+  min-width: 0px;
+  transition: width 0.5s;
+}
+
+#viewDiv {
+  padding: 0;
+  margin: 0;
+  height: 100%;
+  width: 100%;
+}
+
+#viewDiv.noSide {
+  width: 100%;
+}
+
+#hideSideBar {
+  background: rgba(39, 60, 84, 0.8);
+  border: none;
+  color: white;
+  position: absolute;
+  left: 100%;
+}
+
+#layerNameHeader {
+  margin-top: 10%;
+  margin-left: 1%;
+  margin-right: 3%;
+  border-radius: 5px;
+  padding-left: 4%;
+  padding-bottom: 2%;
+  position: absolute;
+  top: 13vh;
+}
+
+.menucontainer#zeroth {
+  margin-top: 10%;
+  margin-left: 3%;
+  margin-right: 3%;
+  border-radius: 5px;
+  padding-left: 4%;
+  padding-bottom: 2%;
+  position: absolute;
+  top: 15vh;
+  width: 90%;
+}
+
+.menucontainer#filter {
+  font-weight: bold;
+  margin-top: 10%;
+  margin-left: 3%;
+  margin-right: 3%;
+  border-radius: 5px;
+  padding-left: 4%;
+  padding-bottom: 2%;
+  position: absolute;
+  top: 17vh;
+  width: 90%;
+}
+
+.layerheadercontainer {
+  margin-top: 10%;
+  margin-left: 3%;
+  margin-right: 3%;
+  border-radius: 5px;
+  padding-left: 2%;
+  padding-bottom: 1%;
+  position: absolute;
+  top: 12vh;
+}
+
+.filtercontainer {
+  margin-top: 10%;
+  margin-left: 3%;
+  margin-right: 3%;
+  border-radius: 5px;
+  padding-left: 2%;
+  padding-bottom: 1%;
+  position: absolute;
+  top: 12vh;
+}
+
+#layersList {
+  list-style: square;
+  color: #ffffff;
+  font-family: Michroma, sans-serif;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: clip;
+  width: 90%;
+  font-size: calc(0.875vw + 0.875vh);
+  padding-top: 0;
+  margin-top: 0;
+}
+
+#layersList > li {
+  text-overflow: clip;
+  width: 90%;
+}
+
+#layersList > li.hover {
+  text-overflow: clip;
+  width: 90%;
+  background-color: rgba(39, 55, 84, 0.75);
+}
+
+.inputcontainer {
+  padding-left: 6%;
+  width: 90%;
+}
+
+input[type=range] {
+  outline: none;
+  width: 100%;
+  appearance: none;
+  opacity: 0.6;
+  -webkit-appearance: none;
+  background: #5b7c5b;
+}
+
+.menucontainer#first {
+  margin-left: 3%;
+  margin-right: 3%;
+  border-radius: 5px;
+  padding-left: 4%;
+  /*padding-bottom: 2%;*/
+  position: absolute;
+  top: 33vh;
+  width: 90%;
+}
+
+.menucontainer#second {
+  margin-left: 3%;
+  margin-right: 3%;
+  border-radius: 5px;
+  padding-left: 4%;
+  /*padding-bottom: 2%;*/
+  position: absolute;
+  top: 55vh;
+  width: 90%;
+}
+
+.menucontainer#third {
+  margin-left: 3%;
+  margin-right: 3%;
+  border-radius: 5px;
+  padding-left: 4%;
+  /*padding-bottom: 2%;*/
+  position: absolute;
+  top: 70vh;
+  width: 90%;
+}
+
+#layertoggle.on {
+  color: #ffffff;
+  font-family: Michroma, sans-serif;
+  font-weight: bold;
+  font-size: 1.75vw;
+}
+
+#layertoggle.off {
+  color: #cccccc;
+  font-family: Michroma, sans-serif;
+  font-weight: bold;
+  font-size: 1.75vw;
+}
+
+.topmenu {
+  background: rgba(38, 61, 81, 0.78);
+  position: absolute;
+  width: 100%;
+  height: 15vh;
+  padding-top: 3%;
+}
+
+img#gis-logo {
+  position: relative;
+  left: 0;
+}
+
+i.menu-button {
+  margin-bottom: 2%;
+}
+
+i.fa-layer-group.unfocused.menu-button {
+  color: rgba(0, 0, 0, 0);
+  /*background-color: rgba(22, 30, 40, 0.7);*/
+  padding: 2%;
+  background-image: url("assets/layers.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 90% 90%;
+  width: 10%;
+  height: 10%;
+  position: relative;
+  top: 22%;
+}
+
+i.fa-filter.unfocused.menu-button {
+  color: rgba(0, 0, 0, 0);
+  /*background-color: rgba(22, 30, 40, 0.7);*/
+  padding: 2%;
+  background-image: url("assets/filter.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 90% 90%;
+  width: 10%;
+  height: 10%;
+  position: relative;
+  top: 22%;
+}
+
+i.fa-layer-group.focused.menu-button {
+  color: rgba(0, 0, 0, 0);
+  /*background-color: rgba(22, 30, 40, 0.7);*/
+  padding: 2%;
+  background-image: url("assets/layers.png");
+  background-color: rgba(39, 55, 84, 0.75);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 90% 90%;
+  width: 10%;
+  height: 10%;
+  position: relative;
+  top: 22%;
+}
+
+i.fa-filter.focused.menu-button {
+  color: rgba(0, 0, 0, 0);
+  /*background-color: rgba(22, 30, 40, 0.7);*/
+  padding: 2%;
+  background-image: url("assets/filter.png");
+  background-color: rgba(39, 55, 84, 0.75);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 90% 90%;
+  width: 10%;
+  height: 10%;
+  position: relative;
+  top: 22%;
+}
+
+input[type=range].slider {
+  -webkit-appearance: none;
+  width: 75%;
+  margin: 5.25px 0;
+  margin-top: 10px;
+}
+
+input[type=range].slider:focus {
+  outline: none;
+}
+input[type=range].slider::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 1.1875vh;
+  cursor: pointer;
+  box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+  background: #273754;
+  border-radius: 0px;
+  border: 0px solid #010100;
+}
+input[type=range].slider::-webkit-slider-thumb {
+  box-shadow: 0px 0px 1px #670000, 0px 0px 0px #810000;
+  border: 0px solid #001e00;
+  height: 2.5vh;
+  width: 3.5vw;
+  border-radius: 0px;
+  background: rgba(211, 216, 224, 0.93);
+  cursor: pointer;
+  -webkit-appearance: none;
+  margin-top: -0.65vh;
+}
+
+input[type=range]#rslider::-webkit-slider-runnable-track {
+  background-image: url("assets/AH\ background-01-01.png");
+  background-position-y: center;
+  background-position-x: center;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  width: 100%;
+}
+
+input[type=range]#rslider:focus::-webkit-slider-runnable-track {
+  background-image: url("assets/AH\ background-01-01.png");
+  background-position-y: center;
+  background-position-x: center;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  width: 100%;
+}
+
+input[type=range]#gslider::-webkit-slider-runnable-track {
+  background-image: url("assets/SAH\ background-01-01.png");
+  background-position-y: center;
+  background-position-x: center;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  width: 100%;
+}
+
+input[type=range]#gslider:focus::-webkit-slider-runnable-track {
+  background-image: url("assets/SAH\ background-01-01.png");
+  background-position-y: center;
+  background-position-x: center;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  width: 100%
+}
+
+input[type=range]#bslider::-webkit-slider-runnable-track {
+  background-image: url("assets/SDAH\ background-01-01-01.png");
+  background-position-y: center;
+  background-position-x: center;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  width: 100%;
+}
+
+input[type=range]#bslider:focus::-webkit-slider-runnable-track {
+  background-image: url("assets/SDAH\ background-01-01-01.png");
+  background-position-y: center;
+  background-position-x: center;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  width: 100%;
+}
+
+table.esri-widget__table {
+  color: #c0c2c4;
+  font-family: Michroma, sans-serif;
+}
+
+table.esri-widget__table tr td {
+  font-size: calc(1.4vw + 0.4vh);
+}
+
+table.esri-widget__table tr th {
+  font-size: calc(1.6vw + 0.5vh);
+}
+
+div.esri-popup__main-container.esri-widget {
+  width: 62vw !important;
+}
+
+#feature-select {
+  display: block;
+	font-size: calc(1vw + 1vh);
+	font-family: Michroma, sans-serif;
+	font-weight: 700;
+	color: #ffffff;
+	line-height: 1.3;
+	padding: .6em 1.4em .5em .8em;
+	width: 90%;
+	max-width: 90%;
+	box-sizing: border-box;
+	margin: 0;
+	border: 1px solid #aaa;
+	box-shadow: 0 1px 0 1px rgba(0,0,0,.04);
+	border-radius: .5em;
+	-webkit-appearance: none;
+	appearance: none;
+  background-color:rgba(39, 55, 84, 0.75);
+  margin: 0;
+}
+
+#feature-select {
+  color: #ffffff;
+  padding: 8px 16px;
+  border: 1px solid transparent;
+  border-color: transparent transparent rgba(0, 0, 0, 0.1) transparent;
+  cursor: pointer;
+}
+
+/* Style items (options): */
+option.select-option {
+  position: absolute;
+  background-color:rgba(39, 55, 84, 0.75);
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 99;
+  color: #ffffff;
+  padding: 8px 16px;
+  border: 1px solid transparent;
+  border-color: transparent transparent rgba(0, 0, 0, 0.1) transparent;
+  cursor: pointer;
+}
+
+h5 {
+  margin-bottom: 5%;
+}
+
+input[type=text] {
+  -webkit-appearance: none;
+  width: 90%;
+  margin: 5.25px 0;
+  margin-top: 10px;
+  padding: 8px 16px;
+  height: 100%;
+  background-color: rgba(39, 55, 84, 0.75);
+  color: #ffffff;
+  font-family: Michroma, sans-serif;
+  border: 1px solid transparent;
+  border-radius: 0.5em;
+  box-sizing: border-box;
+}

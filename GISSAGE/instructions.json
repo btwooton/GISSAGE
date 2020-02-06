@@ -1,0 +1,25 @@
+{
+	"main_script": "GISSAGE.js",
+	"icon": "skeletonWebviewApp.png",
+	"width": 800,
+	"height": 800,
+	"resize": "free",
+	"animation": false,
+	"dependencies": [
+		"WebviewAppCore.js"
+	],
+	"load": {
+		"url": "/uploads/web/index.html",
+		"favicon": "",
+		"zoom": 1.2,
+		"mode": "desktop"
+	},
+  "title": "GIS SAGE",
+  "fileTypes": ["json", "geojson", "csv"],
+  "directory": "text",
+	"version": "0.1",
+	"description": "ArcGIS integration for SAGE2",
+	"keywords": [ "sage2", "skeletonWebviewApp" ],
+	"author": "Billy Troy Wooton <dylank@hawaii.edu>",
+	"license": "SAGE2-Software-License"
+}
