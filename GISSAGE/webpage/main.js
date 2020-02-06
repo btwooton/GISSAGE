@@ -17,12 +17,14 @@ let layerStyleMenuContainer2HTML = '<div class="menucontainer" id="second"><h5 s
 
 let layerStyleMenuContainer3HTML = '<div class="menucontainer" id="third"><h5 style="color: white; font-family: Michroma, sans-serif; font-size: calc(1vw + 1vh);">Toggle Layer</h5><div class="inputcontainer"><div id="layertoggle" class="on">On  <i class="far fa-eye"></i></div></div></div>';
 
-let layerFilterMenuContainer0HTML = `<div class="menucontainer" id="zeroth">
-<h5 style="color: white; font-family: Michroma, sans-serif; font-size: calc(1vw + 1vh);">Select Feature</h5>
-&nbsp; <select id="feature-select"></select>
+let layerFilterMenuContainer0HTML = `<div class="menucontainer" id="filter">
+<h5 style="color: white; font-family: Michroma, sans-serif; font-size: calc(1vw + 1vh);">Select Features</h5>
+&nbsp; <ul id="feature-select"></ul>
 </div>`;
 
+/*
 let layerFilterMenuContainer1HTML = `<div class="menucontainer" id="first" style="display: none;"><h5 style="color: white; font-family: Michroma, sans-serif; font-size: calc(1vw + 1vh);">Filter Query</h5><input type="text" id="filter-input" placeholder="Expression..."></input></div>`
+*/
 
 let layerStyleItems = [
   layerStyleMenuContainer0HTML, 
@@ -33,7 +35,7 @@ let layerStyleItems = [
 
 let filterMenuItems = [
   layerFilterMenuContainer0HTML,
-  layerFilterMenuContainer1HTML
+  //layerFilterMenuContainer1HTML
 ];
 
 let layerHeaderContainerHTML = '<div class="layerheadercontainer"><h5 style="color: white; font-family: Michroma, sans-serif; font-size: calc(1vw + 1vh);">Layers</h5><ul id="layersList"></ul></div>';
@@ -132,28 +134,73 @@ function constructFeatureFilterMenu(layerName) {
   let featureSelect = document.getElementById("feature-select");
   for (let field of globalLayers[layerName].fields) {
     if (field.type === "double") {
-      let option = document.createElement('option');
-      option.innerHTML = field.name;
-      option.value = field.name;
-      option.className = 'select-option';
-      featureSelect.appendChild(option);
-    }
-  }
-  featureSelect.onchange = function(event) {
-    let optionIndex = event.target.selectedIndex;
-    let option = event.target.children[optionIndex]
-    SAGE2_AppState.callFunctionInContainer("consolePrint", "On change detected with option " + option.innerHTML);
-    let filterQueryContainer = document.getElementById("first");
-    filterQueryContainer.style.display = "block";
-    globalSelectedFeature = option.innerHTML;
-    let filterQueryInput = document.getElementById("filter-input");
-    filterQueryInput.onchange = function(event) {
-      SAGE2_AppState.callFunctionInContainer("consolePrint", "On change detected with text " + filterQueryInput.value);
-      globalFilterQuery = filterQueryInput.value;
-      applyFilterToField(layerName, globalSelectedFeature, globalFilterQuery);
-    }
+      let li = document.createElement('li');
+      li.className = 'select-option';
+      let liText = document.createElement('p');
+      liText.innerHTML = field.name;
+      liText.className = 'select-label';
+      let liInput = document.createElement('input');
+      liInput.type = 'text';
+      liInput.className = 'select-input';
+      liInput.placeholder = 'Expression';
+      liInput.style.visibility = 'hidden';
+      li.appendChild(liText);
+      li.appendChild(liInput);
+      featureSelect.appendChild(li);
 
+      li.onmouseenter = function() {
+        li.classList.add('hover');
+      }
+
+      li.onmouseleave = function() {
+        li.classList.remove('hover');
+      }
+
+      liText.onmousedown = function() {
+        li.classList.toggle('highlight');
+        if (liInput.style.visibility === 'hidden') {
+          liInput.style.visibility = 'visible';
+        } else {
+          liInput.style.visibility = 'hidden';
+          liInput.value = '';
+        }
+      }
+    }
   }
+  let filterSubmitLi = document.createElement('li');
+  filterSubmitLi.className = "filter-button-li";
+  let filterSubmitButton = document.createElement('button');
+  filterSubmitButton.innerText = "Submit Filter";
+  filterSubmitButton.id = "filter-submit";
+  filterSubmitButton.onclick = function() {
+    let selectOptions = Array.from(document.getElementsByClassName('select-option'));
+    let filteredOptions = selectOptions.filter((option) => option.classList.contains('highlight'));
+    let filterString = '';
+    for (let i = 0; i < filteredOptions.length; i++) {
+      let selectOption = filteredOptions[i];
+      let liText = selectOption.children[0];
+      let liInput = selectOption.children[1];
+      filterString += `${liText.innerHTML} ${liInput.value}`;
+      if (i < (filteredOptions.length - 1)) {
+        filterString += ' and ';
+      }
+    }
+    applyFilterToLayer(layerName, filterString);
+  }
+  filterSubmitLi.appendChild(filterSubmitButton);
+  featureSelect.appendChild(filterSubmitLi);
+
+  let filterClearLi = document.createElement('li');
+  filterClearLi.className = "filter-button-li";
+  let filterClearButton = document.createElement('button');
+  filterClearButton.innerText = "Clear Filters";
+  filterClearButton.id = "filter-clear";
+  filterClearButton.onclick = function() {
+    clearFilterFromLayer(layerName);
+  }
+  filterClearLi.appendChild(filterClearButton);
+  featureSelect.appendChild(filterClearLi);
+
   constructTopMenu();
 }
 
@@ -615,7 +662,13 @@ function printFieldTypes(layerName) {
   }
 }
 
-function applyFilterToField(layerName, featureName, queryString) {
+function applyFilterToLayer(layerName, filterString) {
+  SAGE2_AppState.callFunctionInContainer("consolePrint", "Adding filter " + filterString);
   let layer = globalLayers[layerName];
-  layer.definitionExpression = `${featureName} ${queryString}`;
+  layer.definitionExpression = filterString;
+}
+
+function clearFilterFromLayer(layerName) {
+  let layer = globalLayers[layerName];
+  layer.definitionExpression = '';
 }
