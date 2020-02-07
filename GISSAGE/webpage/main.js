@@ -1,4 +1,6 @@
-
+/** 
+ * Global references to key entities
+ */
 let globalMap = null;
 let globalView = null;
 let globalSharedPointerLayer = null;
@@ -7,6 +9,9 @@ let globalFilterQuery = "";
 let globalLayers = {};
 let activeMenu = "Layers";
 
+/**
+ * Specification of html skeleton of various menus
+ */
 let topMenuHTML = '<div class="topmenu"><img id="gis-logo" src="./assets/logo.png" height="70px" width="124px" style="height:65%; width:65%;"></img><i id="layer-button" class="fas fa-layer-group unfocused menu-button"></i>&nbsp;<i id="filter-button" class="fas fa-filter unfocused menu-button"></i></div><button id="hideSideBar"><span style="font-size: calc(1.25vw + 1.25vh);"><strong>&lt;</strong></span></button>';
 
 let layerStyleMenuContainer0HTML = '<div class="menucontainer" id="zeroth"><h5 style="color: white; font-family: Michroma, sans-serif; font-size: calc(1vw + 1vh);">Layer Radius</h5><div class="inputcontainer"><input type="range" min="1" max="60" value="6" class="slider" id="pointSizeSlider">&nbsp;<label style="color: white; font-family: Michroma, sans-serif; font-size: calc(.8vw + .8vh);" id="pointSizeLabel"><strong>6</strong></label></div></div>';
@@ -44,9 +49,36 @@ let sidebarMenuHTML = {
   "FeatureFilter": filterMenuItems.join(''),
 };
 
+// Lookup table for the appropriate menu constructors
+let sidebarMenuConstructors = {
+  "Layers": constructLayersMenu,
+  "Filters": constructFiltersMenu,
+  "LayerStyle": constructLayerStyleMenu
+};
+
+// Have the container process the data file once the webpage is loaded
+// Then construct the sidebar menu content
+window.addEventListener("DOMContentLoaded", function() {
+  SAGE2_AppState.callFunctionInContainer("processDataFile");
+  sidebarMenuConstructors[activeMenu]();
+  constructTopMenu();
+});
+
+// Change the application title
+SAGE2_AppState.titleUpdate("GIS-SAGE");
+
+
+/**
+ * This function constructs the topmenu section of the sidebar
+ * including the button used to show/hide the sidebar
+ * Also responsible for binding callbacks to its UI elements
+ * @function constructTopMenu
+ */
 function constructTopMenu() {
   let sideBar = document.getElementById("sideBar");
   let sideBarButton = document.getElementById("hideSideBar");
+
+  // Bind the onclick functionality to the hideSideBar button
   sideBarButton.onclick = function() {
     let topMenu = document.getElementsByClassName("topmenu")[0];
     if (sideBar.className !== "hidden") {
@@ -69,6 +101,7 @@ function constructTopMenu() {
     }
   }
 
+  // bind the onclick function to the layer menu
   let layerButton = document.getElementById('layer-button');
   let filterButton = document.getElementById('filter-button');
   layerButton.onclick = function() {
@@ -87,7 +120,7 @@ function constructTopMenu() {
     }
   }
 
-  
+  // bind the onclick function to the filter menu
   filterButton.onclick = function() {
     let lbclassNames = layerButton.className.split(' ');
     let fbclassNames = filterButton.className.split(' ');
@@ -107,11 +140,18 @@ function constructTopMenu() {
     filterButton.className = fbclassNames.join(' ');
   }
 
+  // set the focused status of the buttons based on the currently active menu
   activeMenu === "Layers" && focusTopMenuButton('layer-button', 'focused');
   activeMenu === "Filters" && focusTopMenuButton('filter-button', 'focused');
   
 }
 
+/**
+ * This function constructs the layerStyle menu for
+ * the currently active layer selected by the user
+ * @function constructLayerStyleMenu
+ * @param {String} layerName the name of the currently active layer
+ */
 function constructLayerStyleMenu(layerName) {
   let sideBar = document.getElementById("sideBar");
   sideBar.innerHTML = topMenuHTML;
@@ -121,12 +161,20 @@ function constructLayerStyleMenu(layerName) {
   constructTopMenu();
 }
 
+/**
+ * This function is responsible for constructing the filterMenu
+ * for the currently active layer selected by the user
+ * @function constructFeatureFilterMenu
+ * @param {String} layerName the name of the currently active layer
+ */
 function constructFeatureFilterMenu(layerName) {
   let sideBar = document.getElementById("sideBar");
   sideBar.innerHTML = topMenuHTML;
   sideBar.innerHTML += `<h5 id="layerNameHeader" style="color: white; font-family: Michroma, sans-serif; font-size: calc(0.9vw + 0.9vh);">Filter:  <span style="color: #A5EAAA;">${layerName}</span></h5>`;
   sideBar.innerHTML += sidebarMenuHTML[activeMenu];
   let featureSelect = document.getElementById("feature-select");
+
+  // Add fields to the list only if they are of a filterable type
   for (let field of globalLayers[layerName].fields) {
     if (field.type === "double" || field.type === "integer") {
       let li = document.createElement('li');
@@ -162,6 +210,8 @@ function constructFeatureFilterMenu(layerName) {
       }
     }
   }
+
+  // Create and add a filter submit button to the list
   let filterSubmitLi = document.createElement('li');
   filterSubmitLi.className = "filter-button-li";
   let filterSubmitButton = document.createElement('button');
@@ -185,6 +235,7 @@ function constructFeatureFilterMenu(layerName) {
   filterSubmitLi.appendChild(filterSubmitButton);
   featureSelect.appendChild(filterSubmitLi);
 
+  // Create and add a filter clear button to the list
   let filterClearLi = document.createElement('li');
   filterClearLi.className = "filter-button-li";
   let filterClearButton = document.createElement('button');
@@ -196,6 +247,7 @@ function constructFeatureFilterMenu(layerName) {
   filterClearLi.appendChild(filterClearButton);
   featureSelect.appendChild(filterClearLi);
 
+  // construct the top menu
   constructTopMenu();
 }
 
@@ -208,6 +260,9 @@ function constructFeatureFilterMenu(layerName) {
 function constructLayersMenu() {
   let sideBar = document.getElementById("sideBar");
   sideBar.innerHTML = sidebarMenuHTML["Layers"];
+
+  // Listen for the addition of new layers to the layersList and bind
+  // the appropriate event handlers to these elements dynamically
   let layerList = document.getElementById("layersList");
   let layerListObserver = new MutationObserver(function() {
     SAGE2_AppState.callFunctionInContainer("consolePrint", "New list item added to layersList");
@@ -253,6 +308,9 @@ function constructFiltersMenu() {
   let sideBar = document.getElementById('sideBar');
   sideBar.innerHTML = sidebarMenuHTML["Filters"];
   let layerList = document.getElementById('layersList');
+
+  // Listen for changes to the filter list and bind the appropriate
+  // event handlers to the elements dynamically
   let filterListObserver = new MutationObserver(function() {
     SAGE2_AppState.callFunctionInContainer("consolePrint", "New list item added to filterList");
     let getMouseHandler = function(listItem, type) {
@@ -288,21 +346,12 @@ function constructFiltersMenu() {
   });
 }
 
-let sidebarMenuConstructors = {
-  "Layers": constructLayersMenu,
-  "Filters": constructFiltersMenu,
-  "LayerStyle": constructLayerStyleMenu
-};
-
-window.addEventListener("DOMContentLoaded", function(event) {
-  SAGE2_AppState.callFunctionInContainer("processDataFile");
-  let sideBar = document.getElementById("sideBar");
-  sidebarMenuConstructors[activeMenu]();
-  constructTopMenu();
-});
-
-SAGE2_AppState.titleUpdate("GIS-SAGE");
-
+/**
+ * Initializes the map from the appropriate source data url
+ * and using the appropriate Layer type based on the sourceType
+ * @function initializeMapFromDataSource
+ * @param {Object} param0 the url and sourceType of the data source 
+ */
 function initializeMapFromDataSource({url, sourceType}) {
   require([
     "esri/Map",
@@ -469,7 +518,13 @@ function initializeMapFromDataSource({url, sourceType}) {
   })
 }
 
-let addCSVDataToMap = function(url) {
+/**
+ * This function adds CSV Data from another app instance
+ * to the map contained in this app instance
+ * @function addCSVDataToMap
+ * @param {String} url The source url of the data being received
+ */
+function addCSVDataToMap(url) {
   require([
     "esri/layers/CSVLayer"
   ], function(CSVLayer) {
@@ -513,7 +568,13 @@ let addCSVDataToMap = function(url) {
   });
 }
 
-let addClientDataToMap = function(url) {
+/**
+ * @function addClientDataToMap
+ * Receives shared geojson (or json) data from another app instance
+ * and adds it to the map in the appropriate layer type
+ * @param {String} url The source url of the data being received
+ */
+function addClientDataToMap(url) {
   require([
     "esri/layers/GeoJSONLayer"
   ], function(GeoJSONLayer) {
@@ -557,7 +618,13 @@ let addClientDataToMap = function(url) {
   })
 }
 
-let attachEventHandlersToLayerStyleControls = function(layerName) {
+/**
+ * This function attaches the event handlers to the style controls
+ * to ensure that they are bound to the currently active map layer
+ * @function attachEventHandlersToLayerStyleControls
+ * @param {String} layerName The name of the currently active layer
+ */
+function attachEventHandlersToLayerStyleControls(layerName) {
   let pointSlider = document.getElementById("pointSizeSlider");
 
   pointSlider.oninput = function() {
@@ -627,11 +694,23 @@ let attachEventHandlersToLayerStyleControls = function(layerName) {
   }
 }
 
+/**
+ * This function adds the name of the layer to the layer list
+ * so that it may be selected from the UI
+ * @function addLayerToLayersList
+ * @param {Layer} layer The Layer to be added to the layerList
+ */
 function addLayerToLayersList(layer) {
   let layerList = document.getElementById("layersList");
   layerList.innerHTML += `<li>${layer.title}</li>`;
 }
 
+/**
+ * Helper function for parsing out the layer title from
+ * the source URL of its data (in most cases the file name)
+ * @function getTitleFromURL
+ * @param {String} url The source url of a data source
+ */
 function getTitleFromURL(url) {
   let layerTitleTokens = url.split('/');
   let fileNameToken = layerTitleTokens[layerTitleTokens.length - 1];
@@ -643,6 +722,13 @@ function getTitleFromURL(url) {
   }
 }
 
+/**
+ * This function sets the focus of the top menu buttons
+ * to the appropriate setting based on onclick events
+ * @function focusTopMenuButton
+ * @param {String} id The id of the menu button to be set
+ * @param {String} focus The focus setting of the button
+ */
 function focusTopMenuButton(id, focus) {
   let button = document.getElementById(id);
   let buttonClassNames = button.className.split(' ');
@@ -650,6 +736,12 @@ function focusTopMenuButton(id, focus) {
   button.className = buttonClassNames.join(' ');
 }
 
+/**
+ * This function is used to add a shared pointer from another
+ * app instance at the specified coordinates on the map
+ * @function addSharedPointer
+ * @param {Object} coords Object containing the lat/long coords of the pointer
+ */
 function addSharedPointer(coords) {
   SAGE2_AppState.callFunctionInContainer("consolePrint", "Adding shared pointer");
   require([
@@ -682,17 +774,33 @@ function addSharedPointer(coords) {
   })
 }
 
+/**
+ * This function is used to update the lat/long position of the shared
+ * pointer shared to this application from another instance
+ * @function updateSharedPointer
+ * @param {Object} coords Object containing the updated lat/long
+ */
 function updateSharedPointer(coords) {
   SAGE2_AppState.callFunctionInContainer("consolePrint", "Updating shared pointer");
   globalSharedPointerLayer.removeAll();
   addSharedPointer(coords);
 }
 
+/**
+ * Removes the shared pointer from this app instance
+ * @function removeSharedPointer
+ */
 function removeSharedPointer() {
   SAGE2_AppState.callFunctionInContainer("consolePrint", "Removing shared pointer");
   globalSharedPointerLayer.removeAll();
 }
 
+/**
+ * Helper function to print the types of the data fields
+ * in the currently active layer
+ * @function printFieldTypes
+ * @param {String} layerName The name of the currently active Layer
+ */
 function printFieldTypes(layerName) {
   for (let field of globalLayers[layerName].fields) {
     SAGE2_AppState.callFunctionInContainer("consolePrint", `Field ${field.name} has type ${field.type}`);
