@@ -355,6 +355,7 @@ input[type=range]#bslider:focus::-webkit-slider-runnable-track {
 table.esri-widget__table {
   color: #c0c2c4;
   font-family: Michroma, sans-serif;
+  overflow: scroll;
 }
 
 table.esri-widget__table tr td {
@@ -362,15 +363,15 @@ table.esri-widget__table tr td {
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
-  width: 100%;
+  width: 90%;
 }
 
 table.esri-widget__table tr th {
   font-size: calc(1.6vw + 0.5vh);
-  text-overflow: ellipsis;
-  overflow: hidden;
   white-space: nowrap;
-  width: 100%
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 10%
 }
 
 div.esri-popup__main-container.esri-widget {
