@@ -22,10 +22,6 @@ let layerFilterMenuContainer0HTML = `<div class="menucontainer" id="filter">
 &nbsp; <ul id="feature-select"></ul>
 </div>`;
 
-/*
-let layerFilterMenuContainer1HTML = `<div class="menucontainer" id="first" style="display: none;"><h5 style="color: white; font-family: Michroma, sans-serif; font-size: calc(1vw + 1vh);">Filter Query</h5><input type="text" id="filter-input" placeholder="Expression..."></input></div>`
-*/
-
 let layerStyleItems = [
   layerStyleMenuContainer0HTML, 
   layerStyleMenuContainer1HTML,
@@ -35,7 +31,6 @@ let layerStyleItems = [
 
 let filterMenuItems = [
   layerFilterMenuContainer0HTML,
-  //layerFilterMenuContainer1HTML
 ];
 
 let layerHeaderContainerHTML = '<div class="layerheadercontainer"><h5 style="color: white; font-family: Michroma, sans-serif; font-size: calc(1vw + 1vh);">Layers</h5><ul id="layersList"></ul></div>';
@@ -425,44 +420,38 @@ function initializeMapFromDataSource({url, sourceType}) {
               url: url,
               title: layerTitle,
             });
-            layer.when(function() {
-              view.extent = layer.fullExtent;
-              let fieldInfos = [];
-              for (let field of layer.fields) {
-                if (field.name !== "__OBJECTID") {
-                  fieldInfos.push({
-                    fieldName: field.name,
-                    label: field.name
-                  });
-                }
-              }
-              let template = {
-                content: [
-                  {
-                    type: "fields",
-                    fieldInfos: fieldInfos
-                  }
-                ]
-              };
-              layer.popupTemplate = template;
-            }, function() {
-              SAGE2_AppState.callFunctionInContainer("consolePrint", "Webpage failed to set MapView to extent of loaded CSV data");
-            });
-            map.add(layer);
             break;
           case "geojson":
             layer = new GeoJSONLayer({
               url: url,
               title: layerTitle
             });
-            layer.when(function() {
-              view.extent = layer.fullExtent
-            }, function() {
-              SAGE2_AppState.callFunctionInContainer("consolePrint", "Webpage failed to set MapView to extent of loaded data");
-            })
-            map.add(layer);
             break;
         }
+        layer.when(function() {
+          view.extent = layer.fullExtent;
+          let fieldInfos = [];
+          for (let field of layer.fields) {
+            if (field.name !== "__OBJECTID") {
+              fieldInfos.push({
+                fieldName: field.name,
+                label: field.name
+              });
+            }
+          }
+          let template = {
+            content: [
+              {
+                type: "fields",
+                fieldInfos: fieldInfos
+              }
+            ]
+          };
+          layer.popupTemplate = template;
+        }, function() {
+          SAGE2_AppState.callFunctionInContainer("consolePrint", "Webpage failed to set MapView to extent of loaded CSV data");
+        });
+        map.add(layer);
 
         // Add the Layer to the LayerList if needed
         if (!(layerTitle in globalLayers)) {
@@ -489,6 +478,29 @@ let addCSVDataToMap = function(url) {
       url: url,
       title: title,
     });
+    layer.when(function() {
+      globalView.extent = layer.fullExtent;
+      let fieldInfos = [];
+      for (let field of layer.fields) {
+        if (field.name !== "__OBJECTID") {
+          fieldInfos.push({
+            fieldName: field.name,
+            label: field.name
+          });
+        }
+      }
+      let template = {
+        content: [
+          {
+            type: "fields",
+            fieldInfos: fieldInfos
+          }
+        ]
+      };
+      layer.popupTemplate = template;
+    }, function() {
+      SAGE2_AppState.callFunctionInContainer("consolePrint", "Webpage failed to set MapView to extent of loaded CSV data");
+    });
     globalMap.add(layer);
     globalMap.remove(globalSharedPointerLayer);
     globalMap.add(globalSharedPointerLayer);
@@ -509,6 +521,29 @@ let addClientDataToMap = function(url) {
     let layer = new GeoJSONLayer({
       url: url,
       title: title,
+    });
+    layer.when(function() {
+      globalView.extent = layer.fullExtent;
+      let fieldInfos = [];
+      for (let field of layer.fields) {
+        if (field.name !== "__OBJECTID") {
+          fieldInfos.push({
+            fieldName: field.name,
+            label: field.name
+          });
+        }
+      }
+      let template = {
+        content: [
+          {
+            type: "fields",
+            fieldInfos: fieldInfos
+          }
+        ]
+      };
+      layer.popupTemplate = template;
+    }, function() {
+      SAGE2_AppState.callFunctionInContainer("consolePrint", "Webpage failed to set MapView to extent of loaded CSV data");
     });
     globalMap.add(layer);
     globalMap.remove(globalSharedPointerLayer);
@@ -616,8 +651,8 @@ function focusTopMenuButton(id, focus) {
 }
 
 function addSharedPointer(coords) {
+  SAGE2_AppState.callFunctionInContainer("consolePrint", "Adding shared pointer");
   require([
-    "esri/symbols/PictureMarkerSymbol",
     "esri/symbols/SimpleMarkerSymbol",
     "esri/Graphic",
     "esri/geometry/Point"
@@ -648,11 +683,13 @@ function addSharedPointer(coords) {
 }
 
 function updateSharedPointer(coords) {
+  SAGE2_AppState.callFunctionInContainer("consolePrint", "Updating shared pointer");
   globalSharedPointerLayer.removeAll();
   addSharedPointer(coords);
 }
 
 function removeSharedPointer() {
+  SAGE2_AppState.callFunctionInContainer("consolePrint", "Removing shared pointer");
   globalSharedPointerLayer.removeAll();
 }
 
