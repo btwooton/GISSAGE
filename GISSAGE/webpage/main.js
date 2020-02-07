@@ -128,7 +128,7 @@ function constructFeatureFilterMenu(layerName) {
   sideBar.innerHTML += sidebarMenuHTML[activeMenu];
   let featureSelect = document.getElementById("feature-select");
   for (let field of globalLayers[layerName].fields) {
-    if (field.type === "double") {
+    if (field.type === "double" || field.type === "integer") {
       let li = document.createElement('li');
       li.className = 'select-option';
       let liText = document.createElement('p');
@@ -432,7 +432,7 @@ function initializeMapFromDataSource({url, sourceType}) {
           view.extent = layer.fullExtent;
           let fieldInfos = [];
           for (let field of layer.fields) {
-            if (field.name !== "__OBJECTID") {
+            if (!field.name.includes('OBJECTID')) {
               fieldInfos.push({
                 fieldName: field.name,
                 label: field.name
@@ -482,7 +482,7 @@ let addCSVDataToMap = function(url) {
       globalView.extent = layer.fullExtent;
       let fieldInfos = [];
       for (let field of layer.fields) {
-        if (field.name !== "__OBJECTID") {
+        if (!field.name.includes('OBJECTID')) {
           fieldInfos.push({
             fieldName: field.name,
             label: field.name
@@ -526,7 +526,7 @@ let addClientDataToMap = function(url) {
       globalView.extent = layer.fullExtent;
       let fieldInfos = [];
       for (let field of layer.fields) {
-        if (field.name !== "__OBJECTID") {
+        if (!field.name.includes('OBJECTID')) {
           fieldInfos.push({
             fieldName: field.name,
             label: field.name
