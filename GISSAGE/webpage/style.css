@@ -359,10 +359,18 @@ table.esri-widget__table {
 
 table.esri-widget__table tr td {
   font-size: calc(1.4vw + 0.4vh);
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  width: 100%;
 }
 
 table.esri-widget__table tr th {
   font-size: calc(1.6vw + 0.5vh);
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  width: 100%
 }
 
 div.esri-popup__main-container.esri-widget {
