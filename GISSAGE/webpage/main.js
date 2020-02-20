@@ -12,7 +12,7 @@ let activeMenu = "Layers";
 /**
  * Specification of html skeleton of various menus
  */
-let topMenuHTML = '<div class="topmenu"><img id="gis-logo" src="./assets/logo.png" height="70px" width="124px" style="height:65%; width:65%;"></img><i id="layer-button" class="fas fa-layer-group unfocused menu-button"></i>&nbsp;<i id="filter-button" class="fas fa-filter unfocused menu-button"></i></div><button id="hideSideBar"><span style="font-size: calc(1.25vw + 1.25vh);"><strong>&lt;</strong></span></button>';
+let topMenuHTML = '<div class="topmenu"><img id="gis-logo" src="./assets/logo.png" height="70px" width="124px" style="height:65%; width:65%;"></img><i id="layer-button" class="fas fa-layer-group unfocused menu-button"></i>&nbsp;<i id="filter-button" class="fas fa-filter unfocused menu-button"></i>&nbsp;<i id="variable-button" class="fas fa-map-marked-alt unfocused menu-button"></i></div><button id="hideSideBar"><span style="font-size: calc(1.25vw + 1.25vh);"><strong>&lt;</strong></span></button>';
 
 let layerStyleMenuContainer0HTML = '<div class="menucontainer" id="zeroth"><h5 style="color: white; font-family: Michroma, sans-serif; font-size: calc(1vw + 1vh);">Layer Radius</h5><div class="inputcontainer"><input type="range" min="1" max="60" value="6" class="slider" id="pointSizeSlider">&nbsp;<label style="color: white; font-family: Michroma, sans-serif; font-size: calc(.8vw + .8vh);" id="pointSizeLabel"><strong>6</strong></label></div></div>';
 
@@ -27,6 +27,11 @@ let layerFilterMenuContainer0HTML = `<div class="menucontainer" id="filter">
 &nbsp; <ul id="feature-select"></ul>
 </div>`;
 
+let layerVisualMenuContainer0HTML = `<div class="menucontainer" id="visual">
+<h5 style="color: white; font-family: Michroma, sans-serif; font-size: calc(1vw + 1vh);">Select Variables></h5>
+&nbsp; <ul id="visual-select"></ul>
+</div>`;
+
 let layerStyleItems = [
   layerStyleMenuContainer0HTML, 
   layerStyleMenuContainer1HTML,
@@ -38,22 +43,32 @@ let filterMenuItems = [
   layerFilterMenuContainer0HTML,
 ];
 
+let visualVariableItems = [
+  layerVisualMenuContainer0HTML,
+];
+
 let layerHeaderContainerHTML = '<div class="layerheadercontainer"><h5 style="color: white; font-family: Michroma, sans-serif; font-size: calc(1vw + 1vh);">Layers</h5><ul id="layersList"></ul></div>';
 
 let filterContainerHTML = '<div class="filtercontainer"><h5 style="color: white; font-family: Michroma, sans-serif; font-size: calc(1vw + 1vh);">Filters</h5><ul id="layersList"></ul></div>';
 
+let visualVariableContainerHTML = '<div class="visualvarcontainer"><h5 style="color: white; font-family: Michroma, sans-serif; font-size: calc(1vw + 1vh);">Visual Variables</h5><ul id="layersList"></ul></div>';
+
+// Lookup table for the appropriate menu HTML content
 let sidebarMenuHTML = {
   "Layers": topMenuHTML + layerHeaderContainerHTML,
   "Filters": topMenuHTML + filterContainerHTML,
   "LayerStyle": layerStyleItems.join(''),
   "FeatureFilter": filterMenuItems.join(''),
+  "VisualVariables": topMenuHTML + visualVariableContainerHTML,
+  "VisualVariableSelect": visualVariableItems.join('');
 };
 
 // Lookup table for the appropriate menu constructors
 let sidebarMenuConstructors = {
   "Layers": constructLayersMenu,
   "Filters": constructFiltersMenu,
-  "LayerStyle": constructLayerStyleMenu
+  "LayerStyle": constructLayerStyleMenu,
+  "VisualVariables": constructVisualVariableMenu
 };
 
 // Have the container process the data file once the webpage is loaded
@@ -161,6 +176,44 @@ function constructLayerStyleMenu(layerName) {
   constructTopMenu();
 }
 
+function constructVariableSelectMenu(layerName) {
+  let sideBar = document.getElementById("sideBar");
+  sideBar.innerHTML = topMenuHTML;
+  sideBar.innerHTML = `<h5 id="layerNameHeader" style="color: white; font-family: Michroma, sans-serif; font-size: calc(0.9vw + 0.9vh);">Visual: <span style="color: #A5EAAA;">${layerName}</span></h5>`;
+  sideBar.innerHTML += sidebarMenuHTML[activeMenu];
+  let visualSelect = document.getElementById("visual-select");
+
+  // Add fields to the list only if they are of a numeric type
+  for (let field of globalLayers[layerName].fields) {
+    if (field.type === "double" || field.type === "integer") {
+      let li = document.createElement('li');
+      li.className = 'visual-option';
+      let liText = document.createElement('p');
+      liText.innerHTML = field.name;
+      liText.className = 'visual-label';
+      li.appendChild(liText);
+      visualSelect.appendChild(li);
+
+      li.onmouseenter = function() {
+        li.classList.add('hover');
+      }
+
+      li.onmouseleave = function() {
+        li.classList.remove('hover');
+      }
+
+      li.onmousedown = function() {
+        li.classList.toggle('highlight');
+        let listItems = visualSelect.children;
+        for (let listItem of listItems) {
+          listItem !== li && listItem.classList.remove('highlight');
+        }
+      }
+    }
+  }
+
+}
+
 /**
  * This function is responsible for constructing the filterMenu
  * for the currently active layer selected by the user
@@ -252,20 +305,19 @@ function constructFeatureFilterMenu(layerName) {
 }
 
 /**
- * This function constructs the Layers menu for the SideBar
- * This function is called at application start, as the default
- * state of the SideBar is to display the Layers menu
- * @function constructLayersMenu
+ * This function is responsible for binding the appropriate mutation observer
+ * which listens for additions to the layer list and binds the appropriate
+ * mouse handlers to newly added layer names
+ * @function bindObserverToLayerList
+ * @param {String} activeMenuContext The menu context of the layer list
+ * @param {Function} constructor The callback for constructing the menu
  */
-function constructLayersMenu() {
-  let sideBar = document.getElementById("sideBar");
-  sideBar.innerHTML = sidebarMenuHTML["Layers"];
-
+function bindObserverToLayerList(activeMenuContext, constructor) {
   // Listen for the addition of new layers to the layersList and bind
   // the appropriate event handlers to these elements dynamically
   let layerList = document.getElementById("layersList");
   let layerListObserver = new MutationObserver(function() {
-    SAGE2_AppState.callFunctionInContainer("consolePrint", "New list item added to layersList");
+    SAGE2_AppState.callFunctionInContainer("consolePrint", "New list item added to visualVariableList");
     let getMouseHandler = function(listItem, type) {
       if (type === "mouseover") {
         return function() {
@@ -281,9 +333,8 @@ function constructLayersMenu() {
         return function() {
           SAGE2_AppState.callFunctionInContainer("consolePrint", "mouseclick detected");
           SAGE2_AppState.callFunctionInContainer("consolePrint", "activating layer " + listItem.innerHTML);
-          activeMenu = "LayerStyle";
-          constructLayerStyleMenu(listItem.innerHTML);
-          printFieldTypes(listItem.innerHTML);
+          activeMenu = activeMenuContext;
+          constructor(listItem.innerHTML);
         }
       }
     }
@@ -301,49 +352,45 @@ function constructLayersMenu() {
 }
 
 /**
+ * This function constructs the Visual Variable Menu for
+ * the SideBar
+ * @function constructVisualVariableMenu
+ */
+function constructVisualVariableMenu() {
+  let sideBar = document.getElementById("sideBar");
+  sideBar.innerHTML = sidebarMenuHTML["VisualVariables"];
+  bindObserverToLayerList(
+    "VisualVariableSelect", 
+    constructVariableSelectMenu
+  );
+}
+
+/**
+ * This function constructs the Layers menu for the SideBar
+ * This function is called at application start, as the default
+ * state of the SideBar is to display the Layers menu
+ * @function constructLayersMenu
+ */
+function constructLayersMenu() {
+  let sideBar = document.getElementById("sideBar");
+  sideBar.innerHTML = sidebarMenuHTML["Layers"];
+  bindObserverToLayerList(
+    "LayerStyle",
+    constructLayerStyleMenu
+  );
+}
+
+/**
  * This function constructs the Filters menu for the SideBar
  * @function constructFiltersMenu
  */
 function constructFiltersMenu() {
   let sideBar = document.getElementById('sideBar');
   sideBar.innerHTML = sidebarMenuHTML["Filters"];
-  let layerList = document.getElementById('layersList');
-
-  // Listen for changes to the filter list and bind the appropriate
-  // event handlers to the elements dynamically
-  let filterListObserver = new MutationObserver(function() {
-    SAGE2_AppState.callFunctionInContainer("consolePrint", "New list item added to filterList");
-    let getMouseHandler = function(listItem, type) {
-      if (type === "mouseover") {
-        return function() {
-          listItem.className = 'hover';
-          SAGE2_AppState.callFunctionInContainer("consolePrint", "mouseover detected");
-        };
-      } else if (type === "mouseout") {
-        return function() {
-          listItem.classList.remove('hover');
-          SAGE2_AppState.callFunctionInContainer("consolePrint", "mouseout detected");
-        }
-      } else {
-        return function() {
-          SAGE2_AppState.callFunctionInContainer("consolePrint", "mouseclick detected");
-          SAGE2_AppState.callFunctionInContainer("consolePrint", "activating layer " + listItem.innerHTML);
-          activeMenu = "FeatureFilter";
-          constructFeatureFilterMenu(listItem.innerHTML);
-        }
-      }
-    }
-    for (let childNode of layerList.childNodes) {
-      childNode.onmouseover = getMouseHandler(childNode, 'mouseover');
-      childNode.onmouseout = getMouseHandler(childNode, 'mouseout');
-      childNode.onclick = getMouseHandler(childNode, "mouseclick");
-    }
-  });
-  filterListObserver.observe(layerList, {
-    subtree: true,
-    childList: true,
-    characterData: true
-  });
+  bindObserverToLayerList(
+    "FeatureFilter",
+    constructFeatureFilterMenu
+  );
 }
 
 /**

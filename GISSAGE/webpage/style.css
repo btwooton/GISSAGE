@@ -213,9 +213,27 @@ i.menu-button {
   margin-bottom: 2%;
 }
 
+i.fa-map-marked-alt.unfocused.menu-button {
+  color: rgb(255, 255, 255);
+  padding: 2%;
+  width: 10%;
+  height: 10%;
+  position: relative;
+  top: 22%;
+}
+
+i.fa-map-marked-alt.focused.menu-button {
+  color: rgb(255, 255, 255);
+  padding: 2%;
+  width: 10%;
+  height: 10%;
+  background-color: rgba(39, 55, 84, 0.75);
+  position: relative;
+  top: 22%;
+}
+
 i.fa-layer-group.unfocused.menu-button {
   color: rgba(0, 0, 0, 0);
-  /*background-color: rgba(22, 30, 40, 0.7);*/
   padding: 2%;
   background-image: url("assets/layers.png");
   background-repeat: no-repeat;
@@ -229,7 +247,6 @@ i.fa-layer-group.unfocused.menu-button {
 
 i.fa-filter.unfocused.menu-button {
   color: rgba(0, 0, 0, 0);
-  /*background-color: rgba(22, 30, 40, 0.7);*/
   padding: 2%;
   background-image: url("assets/filter.png");
   background-repeat: no-repeat;
@@ -243,7 +260,6 @@ i.fa-filter.unfocused.menu-button {
 
 i.fa-layer-group.focused.menu-button {
   color: rgba(0, 0, 0, 0);
-  /*background-color: rgba(22, 30, 40, 0.7);*/
   padding: 2%;
   background-image: url("assets/layers.png");
   background-color: rgba(39, 55, 84, 0.75);
@@ -258,7 +274,6 @@ i.fa-layer-group.focused.menu-button {
 
 i.fa-filter.focused.menu-button {
   color: rgba(0, 0, 0, 0);
-  /*background-color: rgba(22, 30, 40, 0.7);*/
   padding: 2%;
   background-image: url("assets/filter.png");
   background-color: rgba(39, 55, 84, 0.75);
@@ -407,12 +422,36 @@ div.esri-popup__main-container.esri-widget {
   align-items: center;
 }
 
+.visual-option {
+  width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  padding-left: 2%;
+  height: 5%;
+}
+
+.visual-option.hover {
+  background-color: rgba(39, 55, 84, 0.75);
+}
+
+.visual-option.highlight {
+  background-color: rgba(39, 55, 84, 0.75);
+}
+
 .select-option.hover {
   background-color: rgba(39, 55, 84, 0.75);
 }
 
 .select-option.highlight {
   background-color: rgba(39, 55, 84, 0.75);
+}
+
+.visual-label {
+  width: 100%;
+  text-overflow: ellipsis;
+  display: inline-block;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 .select-label {
