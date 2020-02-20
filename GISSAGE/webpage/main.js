@@ -12,7 +12,7 @@ let activeMenu = "Layers";
 /**
  * Specification of html skeleton of various menus
  */
-let topMenuHTML = '<div class="topmenu"><img id="gis-logo" src="./assets/logo.png" height="70px" width="124px" style="height:65%; width:65%;"></img><i id="layer-button" class="fas fa-layer-group unfocused menu-button"></i>&nbsp;<i id="filter-button" class="fas fa-filter unfocused menu-button"></i>&nbsp;<i id="variable-button" class="fas fa-map-marked-alt unfocused menu-button"></i></div><button id="hideSideBar"><span style="font-size: calc(1.25vw + 1.25vh);"><strong>&lt;</strong></span></button>';
+let topMenuHTML = '<div class="topmenu"><img id="gis-logo" src="./assets/logo.png" height="70px" width="124px" style="height:65%; width:65%;"></img><div id="menu-button-container"><i id="layer-button" class="fas fa-layer-group unfocused menu-button"></i>&nbsp;<i id="filter-button" class="fas fa-filter unfocused menu-button"></i>&nbsp;<i id="variable-button" class="fas fa-map-marked-alt unfocused menu-button"></i></div></div><button id="hideSideBar"><span style="font-size: calc(1.25vw + 1.25vh);"><strong>&lt;</strong></span></button>';
 
 let layerStyleMenuContainer0HTML = '<div class="menucontainer" id="zeroth"><h5 style="color: white; font-family: Michroma, sans-serif; font-size: calc(1vw + 1vh);">Layer Radius</h5><div class="inputcontainer"><input type="range" min="1" max="60" value="6" class="slider" id="pointSizeSlider">&nbsp;<label style="color: white; font-family: Michroma, sans-serif; font-size: calc(.8vw + .8vh);" id="pointSizeLabel"><strong>6</strong></label></div></div>';
 
@@ -28,7 +28,7 @@ let layerFilterMenuContainer0HTML = `<div class="menucontainer" id="filter">
 </div>`;
 
 let layerVisualMenuContainer0HTML = `<div class="menucontainer" id="visual">
-<h5 style="color: white; font-family: Michroma, sans-serif; font-size: calc(1vw + 1vh);">Select Variables></h5>
+<h5 style="color: white; font-family: Michroma, sans-serif; font-size: calc(1vw + 1vh);">Select Variables</h5>
 &nbsp; <ul id="visual-select"></ul>
 </div>`;
 
@@ -60,7 +60,7 @@ let sidebarMenuHTML = {
   "LayerStyle": layerStyleItems.join(''),
   "FeatureFilter": filterMenuItems.join(''),
   "VisualVariables": topMenuHTML + visualVariableContainerHTML,
-  "VisualVariableSelect": visualVariableItems.join('');
+  "VisualVariableSelect": visualVariableItems.join('')
 };
 
 // Lookup table for the appropriate menu constructors
@@ -119,6 +119,7 @@ function constructTopMenu() {
   // bind the onclick function to the layer menu
   let layerButton = document.getElementById('layer-button');
   let filterButton = document.getElementById('filter-button');
+  let variableButton = document.getElementById('variable-button');
   layerButton.onclick = function() {
     let lbclassNames = layerButton.className.split(' ');
     if (lbclassNames[2] === 'unfocused') {
@@ -130,6 +131,8 @@ function constructTopMenu() {
       }
       focusTopMenuButton('layer-button', 'focused');
       focusTopMenuButton('filter-button', 'unfocused');
+      focusTopMenuButton('variable-button', 'unfocused');
+      activeMenu = "Layers";
     } else {
       return;
     }
@@ -148,6 +151,8 @@ function constructTopMenu() {
       }
       focusTopMenuButton('layer-button', 'unfocused');
       focusTopMenuButton('filter-button', 'focused');
+      focusTopMenuButton('variable-button', 'unfocused');
+      activeMenu = "Filters";
     } else {
       return;
     }
@@ -155,10 +160,34 @@ function constructTopMenu() {
     filterButton.className = fbclassNames.join(' ');
   }
 
+  // bind the onclick function to the visual variable menu
+  variableButton.onclick = function() {
+    if (variableButton.classList.contains('unfocused')) {
+      constructVisualVariableMenu();
+      constructTopMenu();
+      for (const layerName in globalLayers) {
+        addLayerToLayersList(globalLayers[layerName]);
+        SAGE2_AppState.callFunctionInContainer("consolePrint", `Adding layer ${layerName} to the Visual Variable List`);
+      }
+      focusTopMenuButton('layer-button', 'unfocused');
+      focusTopMenuButton('filter-button', 'unfocused');
+      focusTopMenuButton('variable-button', 'focused');
+      activeMenu = "VisualVariables";
+    } else {
+      return;
+    }
+  }
+
   // set the focused status of the buttons based on the currently active menu
-  activeMenu === "Layers" && focusTopMenuButton('layer-button', 'focused');
-  activeMenu === "Filters" && focusTopMenuButton('filter-button', 'focused');
-  
+  if(activeMenu === "Layers" || activeMenu === "LayerStyle") {
+    focusTopMenuButton('layer-button', 'focused');
+  }
+  if(activeMenu === "Filters" || activeMenu == "FeatureFilter") {
+    focusTopMenuButton('filter-button', 'focused');
+  }
+  if(activeMenu === "VisualVariables" || activeMenu == "VisualVariableSelect") {
+    focusTopMenuButton('variable-button', 'focused');
+  }
 }
 
 /**
@@ -179,7 +208,7 @@ function constructLayerStyleMenu(layerName) {
 function constructVariableSelectMenu(layerName) {
   let sideBar = document.getElementById("sideBar");
   sideBar.innerHTML = topMenuHTML;
-  sideBar.innerHTML = `<h5 id="layerNameHeader" style="color: white; font-family: Michroma, sans-serif; font-size: calc(0.9vw + 0.9vh);">Visual: <span style="color: #A5EAAA;">${layerName}</span></h5>`;
+  sideBar.innerHTML += `<h5 id="layerNameHeader" style="color: white; font-family: Michroma, sans-serif; font-size: calc(0.9vw + 0.9vh);">Visual: <span style="color: #A5EAAA;">${layerName}</span></h5>`;
   sideBar.innerHTML += sidebarMenuHTML[activeMenu];
   let visualSelect = document.getElementById("visual-select");
 
@@ -211,7 +240,8 @@ function constructVariableSelectMenu(layerName) {
       }
     }
   }
-
+  // construct the top menu
+  constructTopMenu();
 }
 
 /**
@@ -317,7 +347,7 @@ function bindObserverToLayerList(activeMenuContext, constructor) {
   // the appropriate event handlers to these elements dynamically
   let layerList = document.getElementById("layersList");
   let layerListObserver = new MutationObserver(function() {
-    SAGE2_AppState.callFunctionInContainer("consolePrint", "New list item added to visualVariableList");
+    SAGE2_AppState.callFunctionInContainer("consolePrint", "New list item added to layerList");
     let getMouseHandler = function(listItem, type) {
       if (type === "mouseover") {
         return function() {
