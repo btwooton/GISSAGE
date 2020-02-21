@@ -5,6 +5,7 @@ let globalMap = null;
 let globalView = null;
 let globalSharedPointerLayer = null;
 let globalSelectedFeature = null;
+let globalSelectedVisualVariableType = null;
 let globalFilterQuery = "";
 let globalLayers = {};
 let activeMenu = "Layers";
@@ -28,7 +29,7 @@ let layerFilterMenuContainer0HTML = `<div class="menucontainer" id="filter">
 </div>`;
 
 let layerVisualMenuContainer0HTML = `<div class="menucontainer" id="visual">
-<h5 style="color: white; font-family: Michroma, sans-serif; font-size: calc(1vw + 1vh);">Select Variables</h5>
+<h5 style="color: white; font-family: Michroma, sans-serif; font-size: calc(1vw + 1vh);">Select Variable</h5>
 &nbsp; <ul id="visual-select"></ul>
 </div>`;
 
@@ -236,6 +237,115 @@ function constructVariableSelectMenu(layerName) {
         let listItems = visualSelect.children;
         for (let listItem of listItems) {
           listItem !== li && listItem.classList.remove('highlight');
+        }
+        let modal = document.getElementById("visualVariableModal");
+        modal.style.display = "block";
+        let close = document.getElementsByClassName("close-modal")[0];
+        close.onclick = function() {
+          modal.style.display = "none";
+        }
+        close.onmouseenter = function() {
+          close.classList.add('hover');
+        }
+        close.onmouseleave = function() {
+          close.classList.remove('hover');
+        }
+        let header = document.getElementById("modal-header-text");
+        header.innerHTML = `Style By <span style="color: #A5EAAA;">${li.innerText}</span>`;
+
+        let replaceColorRadio = document.getElementById("replace-color");
+        let replaceSizeRadio = document.getElementById("replace-size");
+        let replaceOpacityRadio = document.getElementById("replace-opacity");
+
+        let startFeatureInput = document.getElementById("start-feature-range");
+        let endFeatureInput = document.getElementById("end-feature-range");
+        let startVarInput = document.getElementById("start-variable-range");
+        let endVarInput = document.getElementById("end-variable-range");
+
+        let query = globalLayers[layerName].createQuery();
+        let minFeature = {
+          onStatisticField: li.innerText,
+          outStatisticFieldName: `min_${li.innerText}`,
+          statisticType: 'min'
+        };
+        let maxFeature = {
+          onStatisticField: li.innerText,
+          outStatisticFieldName: `max_${li.innerText}`,
+          statisticType: 'max'
+        };
+        query.outStatistics = [minFeature, maxFeature];
+        globalLayers[layerName].queryFeatures(query)
+          .then(function(response) {
+            var stats = response.features[0].attributes;
+            let minField = `min_${li.innerText}`;
+            let maxField = `max_${li.innerText}`;
+            startFeatureInput.value = stats[minField];
+            endFeatureInput.value = stats[maxField];
+          });
+        
+        if (replaceColorRadio.classList.contains('focus')) {
+          startVarInput.value = "#000000";
+          endVarInput.value = "#ffffff";
+        } else if (replaceOpacityRadio.classList.contains('focus')) {
+          startVarInput.value = 0.1;
+          endVarInput.value = 1;
+        } else if (replaceSizeRadio.classList.contains('focus')) {
+          startVarInput.value = 1;
+          endVarInput.value = 40;
+        }
+
+        replaceColorRadio.onclick = function() {
+          SAGE2_AppState.callFunctionInContainer("consolePrint", "Clicked color radio buttom");
+          globalSelectedVisualVariableType = "color";
+          replaceColorRadio.classList.add("focus");
+          replaceSizeRadio.classList.remove("focus");
+          replaceOpacityRadio.classList.remove("focus");
+          startVarInput.value = "#000000";
+          endVarInput.value = "#ffffff";
+        }
+
+        replaceSizeRadio.onclick = function() {
+          globalSelectedVisualVariableType = "size";
+          replaceSizeRadio.classList.add("focus");
+          replaceColorRadio.classList.remove("focus");
+          replaceOpacityRadio.classList.remove("focus");
+          startVarInput.value = 1;
+          endVarInput.value = 40;
+        }
+
+        replaceOpacityRadio.onclick = function() {
+          globalSelectedVisualVariableType = "opacity";
+          replaceOpacityRadio.classList.add("focus");
+          replaceColorRadio.classList.remove("focus");
+          replaceSizeRadio.classList.remove("focus");
+          startVarInput.value = 0.1;
+          endVarInput.value = 1;
+        }
+        let modalSubmitButton = document.getElementById("modal-submit-button");
+        modalSubmitButton.onclick = function() {
+          let stop1 = {};
+          stop1.value = startFeatureInput.value;
+          stop1[globalSelectedVisualVariableType] = startVarInput.value;
+
+          let stop2 = {};
+          stop2.value = endFeatureInput.value;
+          stop2[globalSelectedVisualVariableType] = endVarInput.value;
+          let visualVariable = {
+            type: globalSelectedVisualVariableType,
+            field: li.innerText,
+            stops: [
+              stop1,
+              stop2
+            ]
+          };
+
+          let renderer = globalLayers[layerName].renderer.clone();
+          if (renderer.visualVariables === null) {
+            renderer.visualVariables = [];
+          }
+          renderer.visualVariables = renderer.visualVariables.concat([visualVariable]);
+          globalLayers[layerName].renderer = renderer;
+          modal.style.display = "none";
         }
       }
     }

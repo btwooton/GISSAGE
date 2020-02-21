@@ -24,6 +24,38 @@
     <div id="wrapper">
       <div id="sideBar">
       </div>
+      <div id="visualVariableModal" class="modal">
+        <div class="modal-content">
+          <div class="modal-header">
+            <span class="close-modal">X</span>
+            <h5 id="modal-header-text">Style By </h5>
+          </div>
+          <div class="modal-body">
+            <div class="modal-radio-wrapper">
+              <label class="modal-radio-container">Color
+                <div class="modal-radio-replace focus" id="replace-color"></div>
+              </label>&nbsp;
+              <label class="modal-radio-container">Size
+                <div class="modal-radio-replace" id="replace-size"></div>
+              </label>&nbsp;
+              <label class="modal-radio-container">Opacity
+                <div class="modal-radio-replace" id="replace-opacity"></div>
+              </label>&nbsp;
+            </div>
+            <div class="modal-variable-wrapper">
+              <label class="modal-input-container">Feature Range
+                <input type="text" id="start-feature-range" placeholder="Feature Min">
+                <input type="text" id="end-feature-range" placeholder="Feature Max">
+              </label>
+              <label class="modal-input-container">Variable Range
+                <input type="text" id="start-variable-range" placeholder="Variable Min">
+                <input type="text" id="end-variable-range" placeholder="Variable Max">
+              </label>
+            </div>
+            <button id="modal-submit-button">Submit</button>
+          </div>
+        </div>
+      </div>
       <div id="viewDiv"></div>
       <div id="zoomDiv"></div>
     </div>
