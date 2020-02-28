@@ -21,6 +21,7 @@ html, body {
   background: rgba(39, 55, 84, 0.54);
   width: 25vw;
   transition: width 0.5s;
+  scrollbar-width: none;
 }
 
 #sideBar.hidden {
@@ -157,7 +158,7 @@ html, body {
   text-overflow: ellipsis;
   white-space: nowrap;
   width: 100%;
-  background-color: rgba(39, 55, 84, 0.75);
+  background-color: rgba(138, 169, 188, 0.62);
 }
 
 .inputcontainer {
@@ -266,7 +267,7 @@ i.fa-map-marked-alt.focused.menu-button {
   background-size: 90% 90%;
   width: 10%;
   height: 10%;
-  background-color: rgba(39, 55, 84, 0.75);
+  background-color: rgba(138, 169, 188, 0.62);
   top: 22%;
 }
 
@@ -300,7 +301,7 @@ i.fa-layer-group.focused.menu-button {
   color: rgba(0, 0, 0, 0);
   padding: 2%;
   background-image: url("assets/layers.png");
-  background-color: rgba(39, 55, 84, 0.75);
+  background-color: rgba(138, 169, 188, 0.62);
   background-repeat: no-repeat;
   background-position: center;
   background-size: 90% 90%;
@@ -314,7 +315,7 @@ i.fa-filter.focused.menu-button {
   color: rgba(0, 0, 0, 0);
   padding: 2%;
   background-image: url("assets/filter.png");
-  background-color: rgba(39, 55, 84, 0.75);
+  background-color: rgba(138, 169, 188, 0.62);
   background-repeat: no-repeat;
   background-position: center;
   background-size: 90% 90%;
@@ -439,7 +440,7 @@ div.esri-popup__main-container.esri-widget {
   list-style-type: none;
   color: #ffffff;
   font-family: Michroma, sans-serif;
-  overflow: auto;
+  overflow: hidden;
   width: 100%;
   height: 100%;
   font-size: calc(0.875vw + 0.75vh);
@@ -447,13 +448,14 @@ div.esri-popup__main-container.esri-widget {
   margin-top: 0;
   margin-left: 0;
   padding-left: 0;
+  scrollbar-width: none;
 }
 
 #visual-select {
   list-style-type: none;
   color: #ffffff;
   font-family: Michroma, sans-serif;
-  overflow: auto;
+  overflow: hidden;
   width: 100%;
   height: 100%;
   font-size: calc(0.875vw + 0.75vh);
@@ -461,6 +463,7 @@ div.esri-popup__main-container.esri-widget {
   margin-top: 0;
   margin-left: 0;
   padding-left: 0;
+  scrollbar-width: none;
 }
 
 .select-option {
@@ -484,19 +487,19 @@ div.esri-popup__main-container.esri-widget {
 }
 
 .visual-option.hover {
-  background-color: rgba(39, 55, 84, 0.75);
+  background-color: rgba(138, 169, 188, 0.62);
 }
 
 .visual-option.highlight {
-  background-color: rgba(39, 55, 84, 0.75);
+  background-color: rgba(138, 169, 188, 0.62);
 }
 
 .select-option.hover {
-  background-color: rgba(39, 55, 84, 0.75);
+  background-color: rgba(138, 169, 188, 0.62);
 }
 
 .select-option.highlight {
-  background-color: rgba(39, 55, 84, 0.75);
+  background-color: rgba(138, 169, 188, 0.62);
 }
 
 .visual-label {
@@ -522,7 +525,7 @@ div.esri-popup__main-container.esri-widget {
   padding: 8px 16px;
   display: inline-block;
   height: 100%;
-  background-color: rgba(39, 55, 84, 0.75);
+  background-color: rgba(138, 169, 188, 0.62);
   font-family: Michroma, sans-serif;
   color: #ffffff;
   border: 1px solid transparent;
