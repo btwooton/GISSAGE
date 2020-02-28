@@ -1,6 +1,6 @@
 {
 	"main_script": "GISSAGE.js",
-	"icon": "skeletonWebviewApp.png",
+	"icon": "webpage/assets/logo.png",
 	"width": 800,
 	"height": 800,
 	"resize": "free",
