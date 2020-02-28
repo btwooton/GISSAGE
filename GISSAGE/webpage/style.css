@@ -267,7 +267,7 @@ i.fa-map-marked-alt.focused.menu-button {
   background-size: 90% 90%;
   width: 10%;
   height: 10%;
-  background-color: rgba(138, 169, 188, 0.62);
+  background-color: rgba(138, 169, 188, 0.32);
   top: 22%;
 }
 
@@ -301,7 +301,7 @@ i.fa-layer-group.focused.menu-button {
   color: rgba(0, 0, 0, 0);
   padding: 2%;
   background-image: url("assets/layers.png");
-  background-color: rgba(138, 169, 188, 0.62);
+  background-color: rgba(138, 169, 188, 0.32);
   background-repeat: no-repeat;
   background-position: center;
   background-size: 90% 90%;
@@ -315,7 +315,7 @@ i.fa-filter.focused.menu-button {
   color: rgba(0, 0, 0, 0);
   padding: 2%;
   background-image: url("assets/filter.png");
-  background-color: rgba(138, 169, 188, 0.62);
+  background-color: rgba(138, 169, 188, 0.32);
   background-repeat: no-repeat;
   background-position: center;
   background-size: 90% 90%;
